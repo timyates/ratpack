@@ -22,6 +22,7 @@ import ratpack.handling.Chain;
 import ratpack.handling.Handler;
 import ratpack.func.Action;
 
+import java.util.regex.Pattern;
 /**
  * A Groovy oriented handler chain builder DSL.
  * <p>
@@ -52,6 +53,8 @@ public interface GroovyChain extends Chain {
    */
   GroovyChain handler(String path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
 
+  GroovyChain handler(Pattern path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
+
   /**
    * {@inheritDoc}
    */
@@ -64,11 +67,17 @@ public interface GroovyChain extends Chain {
   @Override
   GroovyChain prefix(String prefix, Handler handler);
 
+  @Override
+  GroovyChain prefix(Pattern prefix, Handler handler);
+
   /**
    * {@inheritDoc}
    */
   @Override
   GroovyChain prefix(String prefix, Action<? super Chain> action) throws Exception;
+
+  @Override
+  GroovyChain prefix(Pattern prefix, Action<? super Chain> action) throws Exception;
 
   /**
    * Creates a {@code List} of {@code Handler} from the given {@code Closure} and adds a {@code Handler} to
@@ -84,11 +93,16 @@ public interface GroovyChain extends Chain {
    */
   GroovyChain prefix(String prefix, @DelegatesTo(value = GroovyChain.class, strategy = Closure.DELEGATE_FIRST) Closure<?> chain) throws Exception;
 
+  GroovyChain prefix(Pattern prefix, @DelegatesTo(value = GroovyChain.class, strategy = Closure.DELEGATE_FIRST) Closure<?> chain) throws Exception;
+
   /**
    * {@inheritDoc}
    */
   @Override
   GroovyChain handler(String path, Handler handler);
+
+  @Override
+  GroovyChain handler(Pattern path, Handler handler);
 
   /**
    * {@inheritDoc}
@@ -102,6 +116,9 @@ public interface GroovyChain extends Chain {
   @Override
   GroovyChain get(String path, Handler handler);
 
+  @Override
+  GroovyChain get(Pattern path, Handler handler);
+
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler} if the
    * relative {@code path} matches the given {@code path} and the {@code request} {@code HTTPMethod} is {@code GET}.
@@ -113,6 +130,8 @@ public interface GroovyChain extends Chain {
    * @return this {@code GroovyChain}
    */
   GroovyChain get(String path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
+
+  GroovyChain get(Pattern path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
 
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler}
@@ -131,6 +150,9 @@ public interface GroovyChain extends Chain {
   @Override
   GroovyChain post(String path, Handler handler);
 
+  @Override
+  GroovyChain post(Pattern path, Handler handler);
+
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler} if the
    * relative {@code path} matches the given {@code path} and the {@code request} {@code HTTPMethod} is {@code POST}.
@@ -142,6 +164,8 @@ public interface GroovyChain extends Chain {
    * @return this {@code GroovyChain}
    */
   GroovyChain post(String path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
+
+  GroovyChain post(Pattern path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
 
   /**
    * {@inheritDoc}
@@ -172,6 +196,9 @@ public interface GroovyChain extends Chain {
   @Override
   GroovyChain put(String path, Handler handler);
 
+  @Override
+  GroovyChain put(Pattern path, Handler handler);
+
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler} if the
    * relative {@code path} matches the given {@code path} and the {@code request} {@code HTTPMethod} is {@code PUT}.
@@ -183,6 +210,8 @@ public interface GroovyChain extends Chain {
    * @return this {@code GroovyChain}
    */
   GroovyChain put(String path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
+
+  GroovyChain put(Pattern path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
 
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler}
@@ -207,6 +236,9 @@ public interface GroovyChain extends Chain {
   @Override
   GroovyChain patch(String path, Handler handler);
 
+  @Override
+  GroovyChain patch(Pattern path, Handler handler);
+
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler} if the
    * relative {@code path} matches the given {@code path} and the {@code request} {@code HTTPMethod} is {@code PATCH}.
@@ -218,6 +250,8 @@ public interface GroovyChain extends Chain {
    * @return this {@code GroovyChain}
    */
   GroovyChain patch(String path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
+
+  GroovyChain patch(Pattern path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
 
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler}
@@ -242,6 +276,9 @@ public interface GroovyChain extends Chain {
   @Override
   GroovyChain delete(String path, Handler handler);
 
+  @Override
+  GroovyChain delete(Pattern path, Handler handler);
+
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler} if the
    * relative {@code path} matches the given {@code path} and the {@code request} {@code HTTPMethod} is {@code DELETE}.
@@ -253,6 +290,8 @@ public interface GroovyChain extends Chain {
    * @return this {@code GroovyChain}
    */
   GroovyChain delete(String path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
+
+  GroovyChain delete(Pattern path, @DelegatesTo(value = GroovyContext.class, strategy = Closure.DELEGATE_FIRST) Closure<?> handler);
 
   /**
    * Adds a {@code Handler} to this {@code GroovyChain} that delegates to the given {@code Closure} as a {@code Handler}

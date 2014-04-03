@@ -28,6 +28,8 @@ import ratpack.handling.Handler;
 import ratpack.launch.LaunchConfig;
 import ratpack.registry.Registry;
 
+import java.util.regex.Pattern;
+
 import static ratpack.groovy.Groovy.groovyHandler;
 
 public class DefaultGroovyChain implements GroovyChain {
@@ -56,7 +58,19 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain prefix(Pattern prefix, Handler handler) {
+    delegate.prefix(prefix, handler);
+    return this;
+  }
+
+  @Override
   public GroovyChain prefix(String prefix, Action<? super Chain> action) throws Exception {
+    delegate.prefix(prefix, action);
+    return this;
+  }
+
+  @Override
+  public GroovyChain prefix(Pattern prefix, Action<? super Chain> action) throws Exception {
     delegate.prefix(prefix, action);
     return this;
   }
@@ -67,7 +81,17 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain prefix(Pattern prefix, Closure<?> chain) throws Exception {
+    return prefix(prefix, toHandler(chain));
+  }
+
+  @Override
   public GroovyChain handler(String path, Closure<?> handler) {
+    return handler(path, groovyHandler(handler));
+  }
+
+  @Override
+  public GroovyChain handler(Pattern path, Closure<?> handler) {
     return handler(path, groovyHandler(handler));
   }
 
@@ -78,12 +102,29 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain handler(Pattern path, Handler handler) {
+    delegate.handler(path, handler);
+    return this;
+  }
+
+  @Override
   public GroovyChain get(String path, Closure<?> handler) {
     return get(path, groovyHandler(handler));
   }
 
   @Override
+  public GroovyChain get(Pattern path, Closure<?> handler) {
+    return get(path, groovyHandler(handler));
+  }
+
+  @Override
   public GroovyChain get(String path, Handler handler) {
+    delegate.get(path, handler);
+    return this;
+  }
+
+  @Override
+  public GroovyChain get(Pattern path, Handler handler) {
     delegate.get(path, handler);
     return this;
   }
@@ -106,7 +147,18 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain post(Pattern path, Handler handler) {
+    delegate.post(path, handler);
+    return this;
+  }
+
+  @Override
   public GroovyChain post(String path, Closure<?> handler) {
+    return post(path, groovyHandler(handler));
+  }
+
+  @Override
+  public GroovyChain post(Pattern path, Closure<?> handler) {
     return post(path, groovyHandler(handler));
   }
 
@@ -127,7 +179,18 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain put(Pattern path, Closure<?> handler) {
+    return put(path, groovyHandler(handler));
+  }
+
+  @Override
   public GroovyChain put(String path, Handler handler) {
+    delegate.put(path, handler);
+    return this;
+  }
+
+  @Override
+  public GroovyChain put(Pattern path, Handler handler) {
     delegate.put(path, handler);
     return this;
   }
@@ -149,7 +212,18 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain patch(Pattern path, Closure<?> handler) {
+    return patch(path, groovyHandler(handler));
+  }
+
+  @Override
   public GroovyChain patch(String path, Handler handler) {
+    delegate.patch(path, handler);
+    return this;
+  }
+
+  @Override
+  public GroovyChain patch(Pattern path, Handler handler) {
     delegate.patch(path, handler);
     return this;
   }
@@ -171,7 +245,18 @@ public class DefaultGroovyChain implements GroovyChain {
   }
 
   @Override
+  public GroovyChain delete(Pattern path, Closure<?> handler) {
+    return delete(path, groovyHandler(handler));
+  }
+
+  @Override
   public GroovyChain delete(String path, Handler handler) {
+    delegate.delete(path, handler);
+    return this;
+  }
+
+  @Override
+  public GroovyChain delete(Pattern path, Handler handler) {
     delegate.delete(path, handler);
     return this;
   }

@@ -27,55 +27,27 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TokenPathBinder implements PathBinder {
+public class RegexPathBinder implements PathBinder {
 
   private final ImmutableList<String> tokenNames;
   private final Pattern regex;
 
-  public TokenPathBinder(String path, boolean exact) {
+  public RegexPathBinder(Pattern path, boolean exact) {
     ImmutableList.Builder<String> namesBuilder = ImmutableList.builder();
-    String pattern = Pattern.quote(path);
 
-    Pattern placeholderPattern = Pattern.compile("((?:^|/):(\\w+)\\??)");
-    Matcher matchResult = placeholderPattern.matcher(path);
-
-    String replacementStart = "\\\\E(?:(?:^|/)([^/?&#]+))";
-    StringBuilder replacementBuilder = new StringBuilder(replacementStart);
-
-    boolean hasOptional = false;
-
-    while (matchResult.find()) {
-      String part = matchResult.group(1);
-      String name = matchResult.group(2);
-      boolean optional = part.endsWith("?");
-
-      if (!hasOptional && optional) {
-        int contentQuantifierIndex = replacementStart.indexOf("+");
-        replacementBuilder.replace(contentQuantifierIndex, contentQuantifierIndex + 1, "*");
-      }
-
-      hasOptional = hasOptional || optional;
-      if (hasOptional && !optional) {
-        throw new IllegalArgumentException(String.format("path %s should not define mandatory parameters after an optional parameter", path));
-      }
-
-      if (optional) {
-        replacementBuilder.append("?");
-      }
-      replacementBuilder.append("\\\\Q");
-      pattern = pattern.replaceFirst(Pattern.quote(part), replacementBuilder.toString());
-      namesBuilder.add(name);
-      replacementBuilder.delete(replacementStart.length(), replacementBuilder.length());
+    Matcher m = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>").matcher(path.pattern());
+    while (m.find()) {
+      namesBuilder.add(m.group(1));
     }
 
-    StringBuilder patternBuilder = new StringBuilder("(").append(pattern).append(")");
+    StringBuilder patternBuilder = new StringBuilder("(").append(path.pattern()).append(")");
     if (exact) {
       patternBuilder.append("(?:/|$)");
     } else {
       patternBuilder.append("(?:/.*)?");
     }
 
-    System.out.println( "TPB: " + path + " :: " + patternBuilder.toString() + " :: " + namesBuilder.build() ) ;
+    System.out.println( "RPB: " + path + " :: " + patternBuilder.toString() + " :: " + namesBuilder.build() ) ;
 
     this.regex = Pattern.compile(patternBuilder.toString());
     this.tokenNames = namesBuilder.build();
@@ -90,9 +62,8 @@ public class TokenPathBinder implements PathBinder {
       MatchResult matchResult = matcher.toMatchResult();
       String boundPath = matchResult.group(1);
       ImmutableMap.Builder<String, String> paramsBuilder = ImmutableMap.builder();
-      int i = 2;
       for (String name : tokenNames) {
-        String value = matchResult.group(i++);
+        String value = matcher.group(name);
         if (value != null) {
           paramsBuilder.put(name, decodeURIComponent(value));
         }

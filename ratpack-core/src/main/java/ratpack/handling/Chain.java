@@ -21,6 +21,7 @@ import ratpack.launch.LaunchConfig;
 import ratpack.registry.Registry;
 import ratpack.func.Action;
 
+import java.util.regex.Pattern;
 /**
  * A chain can be used to build a linked series of handlers.
  * <p>
@@ -140,6 +141,8 @@ public interface Chain {
    */
   Chain handler(String path, Handler handler);
 
+  Chain handler(Pattern path, Handler handler);
+
   /**
    * Adds a handler that delegates to the given handler if the relative path starts with the given {@code prefix}.
    * <p>
@@ -152,6 +155,8 @@ public interface Chain {
    * @return this
    */
   Chain prefix(String prefix, Handler handler);
+
+  Chain prefix(Pattern prefix, Handler handler);
 
   /**
    * Adds a handler that delegates to the given handlers if the
@@ -197,6 +202,8 @@ public interface Chain {
    */
   Chain prefix(String prefix, Action<? super Chain> action) throws Exception;
 
+  Chain prefix(Pattern prefix, Action<? super Chain> action) throws Exception;
+
   /**
    * Adds a handler that delegates to the given handler
    * if the relative {@code path} matches the given {@code path} and the {@code request}
@@ -213,6 +220,8 @@ public interface Chain {
    * @see Chain#handler(String, Handler)
    */
   Chain get(String path, Handler handler);
+
+  Chain get(Pattern path, Handler handler);
 
   /**
    * Adds a handler that delegates to the given handler
@@ -245,6 +254,8 @@ public interface Chain {
    */
   Chain post(String path, Handler handler);
 
+  Chain post(Pattern path, Handler handler);
+
   /**
    * Adds a handler that delegates to the given handler if
    * the {@code request} {@code HTTPMethod} is {@code POST} and the {@code path} is at the current root.
@@ -275,6 +286,8 @@ public interface Chain {
    */
   Chain put(String path, Handler handler);
 
+  Chain put(Pattern path, Handler handler);
+
   /**
    * Adds a handler that delegates to the given handler if
    * the {@code request} {@code HTTPMethod} is {@code PUT} and the {@code path} is at the current root.
@@ -304,6 +317,8 @@ public interface Chain {
    */
   Chain patch(String path, Handler handler);
 
+  Chain patch(Pattern path, Handler handler);
+
   /**
    * Adds a handler that delegates to the given handler if
    * the {@code request} {@code HTTPMethod} is {@code PATCH} and the {@code path} is at the current root.
@@ -332,6 +347,8 @@ public interface Chain {
    * @see Chain#handler(String, Handler)
    */
   Chain delete(String path, Handler handler);
+
+  Chain delete(Pattern path, Handler handler);
 
   /**
    * Adds a handler that delegates to the given handler if

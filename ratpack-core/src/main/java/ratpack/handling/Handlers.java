@@ -29,9 +29,11 @@ import ratpack.launch.LaunchConfig;
 import ratpack.path.PathBinder;
 import ratpack.path.internal.PathHandler;
 import ratpack.path.internal.TokenPathBinder;
+import ratpack.path.internal.RegexPathBinder;
 import ratpack.registry.Registry;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 
@@ -255,6 +257,10 @@ public abstract class Handlers {
     return path(new TokenPathBinder(prefix, false), handler);
   }
 
+  public static Handler prefix(Pattern prefix, Handler handler) {
+    return path(new RegexPathBinder(prefix, false), handler);
+  }
+
   /**
    * Creates a handler that delegates to the given handlers if the request matches the given path exactly.
    * <p>
@@ -269,6 +275,10 @@ public abstract class Handlers {
    */
   public static Handler path(String path, Handler handler) {
     return path(new TokenPathBinder(path, true), handler);
+  }
+
+  public static Handler path(Pattern path, Handler handler) {
+    return path(new RegexPathBinder(path, true), handler);
   }
 
   /**

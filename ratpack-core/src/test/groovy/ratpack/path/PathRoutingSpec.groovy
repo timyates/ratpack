@@ -135,11 +135,41 @@ class PathRoutingSpec extends RatpackGroovyDslSpec {
     getText("1/2/3") == "[a:1, b:2, c:3] - "
   }
 
+  def "can route by exact path with named groups"() {
+    when:
+    handlers {
+      handler(~"(?<a>[^/])/(?<b>[^/])/(?<c>[^/])") {
+        def binding = get(PathBinding)
+        response.send("$binding.tokens - $binding.pastBinding")
+      }
+    }
+
+    then:
+    get("1/2/3/4/5").statusCode == NOT_FOUND.code()
+    getText("1/2/3") == "[a:1, b:2, c:3] - "
+  }
+
   def "can route by nested exact path with tokens"() {
     when:
     handlers {
       prefix(":a/:b") {
         handler(":d/:e") {
+          def binding = get(PathBinding)
+          response.send("$binding.tokens - $binding.allTokens - $binding.pastBinding")
+        }
+      }
+    }
+
+    then:
+    getText("1/2/3/4") == "[d:3, e:4] - [a:1, b:2, d:3, e:4] - "
+    get("1/2/3/4/5/6").statusCode == NOT_FOUND.code()
+  }
+
+  def "can route by nested exact path with named groups"() {
+    when:
+    handlers {
+      prefix(~"(?<a>[^/])/(?<b>[^/])") {
+        handler(~"(?<d>[^/])/(?<e>[^/])") {
           def binding = get(PathBinding)
           response.send("$binding.tokens - $binding.allTokens - $binding.pastBinding")
         }

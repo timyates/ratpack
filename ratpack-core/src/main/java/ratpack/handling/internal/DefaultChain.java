@@ -25,6 +25,7 @@ import ratpack.registry.Registry;
 import ratpack.func.Action;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 
@@ -57,7 +58,15 @@ public class DefaultChain implements Chain {
     return handler(Handlers.path(path, handler));
   }
 
+  public Chain handler(Pattern path, Handler handler) {
+    return handler(Handlers.path(path, handler));
+  }
+
   public Chain prefix(String prefix, Handler handler) {
+    return handler(Handlers.prefix(prefix, handler));
+  }
+
+  public Chain prefix(Pattern prefix, Handler handler) {
     return handler(Handlers.prefix(prefix, handler));
   }
 
@@ -65,7 +74,15 @@ public class DefaultChain implements Chain {
     return prefix(prefix, chain(action));
   }
 
+  public Chain prefix(Pattern prefix, Action<? super Chain> action) throws Exception {
+    return prefix(prefix, chain(action));
+  }
+
   public Chain get(String path, Handler handler) {
+    return handler(Handlers.path(path, Handlers.chain(Handlers.get(), handler)));
+  }
+
+  public Chain get(Pattern path, Handler handler) {
     return handler(Handlers.path(path, Handlers.chain(Handlers.get(), handler)));
   }
 
@@ -77,11 +94,19 @@ public class DefaultChain implements Chain {
     return handler(Handlers.path(path, Handlers.chain(Handlers.post(), handler)));
   }
 
+  public Chain post(Pattern path, Handler handler) {
+    return handler(Handlers.path(path, Handlers.chain(Handlers.post(), handler)));
+  }
+
   public Chain post(Handler handler) {
     return post("", handler);
   }
 
   public Chain put(String path, Handler handler) {
+    return handler(Handlers.path(path, Handlers.chain(Handlers.put(), handler)));
+  }
+
+  public Chain put(Pattern path, Handler handler) {
     return handler(Handlers.path(path, Handlers.chain(Handlers.put(), handler)));
   }
 
@@ -93,11 +118,19 @@ public class DefaultChain implements Chain {
     return handler(Handlers.path(path, Handlers.chain(Handlers.patch(), handler)));
   }
 
+  public Chain patch(Pattern path, Handler handler) {
+    return handler(Handlers.path(path, Handlers.chain(Handlers.patch(), handler)));
+  }
+
   public Chain patch(Handler handler) {
     return patch("", handler);
   }
 
   public Chain delete(String path, Handler handler) {
+    return handler(Handlers.path(path, Handlers.chain(Handlers.delete(), handler)));
+  }
+
+  public Chain delete(Pattern path, Handler handler) {
     return handler(Handlers.path(path, Handlers.chain(Handlers.delete(), handler)));
   }
 
