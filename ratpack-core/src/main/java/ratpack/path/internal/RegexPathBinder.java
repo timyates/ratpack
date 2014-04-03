@@ -47,8 +47,6 @@ public class RegexPathBinder implements PathBinder {
       patternBuilder.append("(?:/.*)?");
     }
 
-    System.out.println( "RPB: " + path + " :: " + patternBuilder.toString() + " :: " + namesBuilder.build() ) ;
-
     this.regex = Pattern.compile(patternBuilder.toString());
     this.tokenNames = namesBuilder.build();
   }

@@ -75,8 +75,6 @@ public class TokenPathBinder implements PathBinder {
       patternBuilder.append("(?:/.*)?");
     }
 
-    System.out.println( "TPB: " + path + " :: " + patternBuilder.toString() + " :: " + namesBuilder.build() ) ;
-
     this.regex = Pattern.compile(patternBuilder.toString());
     this.tokenNames = namesBuilder.build();
   }
