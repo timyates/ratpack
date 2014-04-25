@@ -18,8 +18,9 @@ package ratpack.path.internal;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import ratpack.path.PathBinder;
 import ratpack.path.PathBinding;
+import ratpack.path.PathBinder;
+import ratpack.path.PathBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -32,51 +33,66 @@ public class TokenPathBinder implements PathBinder {
   private final ImmutableList<String> tokenNames;
   private final Pattern regex;
 
-  public TokenPathBinder(String path, boolean exact) {
-    ImmutableList.Builder<String> namesBuilder = ImmutableList.builder();
-    String pattern = Pattern.quote(path);
+  protected TokenPathBinder(ImmutableList<String> tokenNames, Pattern regex) {
+    this.tokenNames = tokenNames;
+    this.regex = regex;
+  }
 
-    Pattern placeholderPattern = Pattern.compile("((?:^|/):(\\w+)\\??)");
+  public static PathBinder build(String path, boolean exact) {
+    PathBuilder pathBuilder = new DefaultPathBuilder();
+
+    Pattern placeholderPattern = Pattern.compile("((?:^|/):(\\w+)\\??:([^/])+)|((?:^|/)::([^/])+)|((?:^|/):(\\w+)\\??)");
+
+    Pattern optTokPattern = Pattern.compile("/?:(\\w*)\\?:(.+)");
+    Pattern tokPattern    = Pattern.compile("/?:(\\w*):(.+)");
+    Pattern tok           = Pattern.compile("/?:(\\w*)");
+    Pattern optTok        = Pattern.compile("/?:(\\w*)\\?");
+    Pattern litPattern    = Pattern.compile("/?::(.+)");
+
     Matcher matchResult = placeholderPattern.matcher(path);
 
-    String replacementStart = "\\\\E(?:(?:^|/)([^/?&#]+))";
-    StringBuilder replacementBuilder = new StringBuilder(replacementStart);
-
-    boolean hasOptional = false;
+    boolean tokenized = false;
+    int lastIndex = 0;
 
     while (matchResult.find()) {
-      String part = matchResult.group(1);
-      String name = matchResult.group(2);
-      boolean optional = part.endsWith("?");
-
-      if (!hasOptional && optional) {
-        int contentQuantifierIndex = replacementStart.indexOf("+");
-        replacementBuilder.replace(contentQuantifierIndex, contentQuantifierIndex + 1, "*");
+      tokenized = true;
+      int thisIndex = matchResult.start();
+      if (thisIndex != lastIndex) {
+        pathBuilder.literal(path.substring(lastIndex, thisIndex));
       }
-
-      hasOptional = hasOptional || optional;
-      if (hasOptional && !optional) {
-        throw new IllegalArgumentException(String.format("path %s should not define mandatory parameters after an optional parameter", path));
+      lastIndex = matchResult.end();
+      String component = matchResult.group(0);
+      Matcher m = optTokPattern.matcher(component);
+      if (m.matches()) {
+        pathBuilder.optionalTokenWithPattern(m.group(1), m.group(2));
+        continue;
       }
-
-      if (optional) {
-        replacementBuilder.append("?");
+      m = litPattern.matcher(component);
+      if (m.matches()) {
+        pathBuilder.literalPattern(m.group(1));
+        continue;
       }
-      replacementBuilder.append("\\\\Q");
-      pattern = pattern.replaceFirst(Pattern.quote(part), replacementBuilder.toString());
-      namesBuilder.add(name);
-      replacementBuilder.delete(replacementStart.length(), replacementBuilder.length());
+      m = tokPattern.matcher(component);
+      if (m.matches()) {
+        pathBuilder.tokenWithPattern(m.group(1), m.group(2));
+        continue;
+      }
+      m = tok.matcher(component);
+      if (m.matches()) {
+        pathBuilder.token(m.group(1));
+        continue;
+      }
+      m = optTok.matcher(component);
+      if (m.matches()) {
+        pathBuilder.optionalToken(m.group(1));
+        continue;
+      }
+      throw new IllegalArgumentException(String.format("Cannot match path %s (%s)", path, component));
     }
-
-    StringBuilder patternBuilder = new StringBuilder("(").append(pattern).append(")");
-    if (exact) {
-      patternBuilder.append("(?:/|$)");
-    } else {
-      patternBuilder.append("(?:/.*)?");
+    if (lastIndex < path.length()) {
+      pathBuilder.literal(path.substring(lastIndex));
     }
-
-    this.regex = Pattern.compile(patternBuilder.toString());
-    this.tokenNames = namesBuilder.build();
+    return pathBuilder.build(exact);
   }
 
   public PathBinding bind(String path, PathBinding parentBinding) {
